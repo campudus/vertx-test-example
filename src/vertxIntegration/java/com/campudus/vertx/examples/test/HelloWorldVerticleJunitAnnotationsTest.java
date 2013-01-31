@@ -49,7 +49,7 @@ public class HelloWorldVerticleJunitAnnotationsTest extends VertxTestBase {
 		checkAsync("hello", new JsonObject().putString("say", "hello"), new Handler<JsonObject>() {
 			@Override
 			public void handle(JsonObject event) {
-				assertEquals(event.getString("result"), "hi there!");
+				assertEquals("hi there!", event.getString("result"));
 				assertNull(event.getString("error"));
 			}
 		});
@@ -60,7 +60,7 @@ public class HelloWorldVerticleJunitAnnotationsTest extends VertxTestBase {
 		checkAsync("hello", new JsonObject().putString("say", "bye"), new Handler<JsonObject>() {
 			@Override
 			public void handle(JsonObject event) {
-				assertEquals(event.getString("result"), "have a nice day!");
+				assertEquals("have a nice day!", event.getString("result"));
 				assertNull(event.getString("error"));
 			}
 		});
@@ -73,7 +73,7 @@ public class HelloWorldVerticleJunitAnnotationsTest extends VertxTestBase {
 					@Override
 					public void handle(JsonObject event) {
 						assertNull(event.getString("result"));
-						assertEquals(event.getString("error"), "action missing");
+						assertEquals("action missing", event.getString("error"));
 					}
 				});
 	}
@@ -84,7 +84,7 @@ public class HelloWorldVerticleJunitAnnotationsTest extends VertxTestBase {
 			@Override
 			public void handle(JsonObject event) {
 				assertNull(event.getString("result"));
-				assertEquals(event.getString("error"), "don't know what to say");
+				assertEquals("don't know what to say", event.getString("error"));
 			}
 		});
 	}

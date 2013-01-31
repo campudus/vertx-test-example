@@ -47,7 +47,7 @@ class HelloWorldVerticleJunitAnnotatedScalaTest extends VertxTestBase {
   def testHello() {
     checkAsync("hello", new JsonObject().putString("say", "hello"), {
       event =>
-        assertEquals(event.getString("result"), "hi there!");
+        assertEquals("hi there!", event.getString("result"));
         assertNull(event.getString("error"));
     });
   }
@@ -56,7 +56,7 @@ class HelloWorldVerticleJunitAnnotatedScalaTest extends VertxTestBase {
   def testBye() {
     checkAsync("hello", new JsonObject().putString("say", "bye"), {
       event =>
-        assertEquals(event.getString("result"), "have a nice day!");
+        assertEquals("have a nice day!", event.getString("result"));
         assertNull(event.getString("error"));
     });
   }
@@ -65,8 +65,8 @@ class HelloWorldVerticleJunitAnnotatedScalaTest extends VertxTestBase {
   def testMissing() {
     checkAsync("hello", new JsonObject().putString("foobar", "hello"), {
       event =>
-        assertNull(event.getString("result") == null);
-        assertEquals(event.getString("error"), "action missing");
+        assertNull(event.getString("result"));
+        assertEquals("action missing", event.getString("error"));
     });
   }
 
@@ -75,7 +75,7 @@ class HelloWorldVerticleJunitAnnotatedScalaTest extends VertxTestBase {
     checkAsync("hello", new JsonObject().putString("say", "foobar"), {
       event =>
         assertNull(event.getString("result"));
-        assertEquals(event.getString("error"), "don't know what to say");
+        assertEquals("don't know what to say", event.getString("error"));
     });
   }
 }
