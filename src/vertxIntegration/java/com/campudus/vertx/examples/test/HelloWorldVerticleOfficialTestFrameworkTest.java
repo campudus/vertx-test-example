@@ -1,13 +1,13 @@
 package com.campudus.vertx.examples.test;
 
 import org.junit.Test;
-import org.vertx.java.framework.TestBase;
+import org.vertx.java.testframework.TestBase;
 
-public class HelloWorldVerticleTest extends TestBase {
+public class HelloWorldVerticleOfficialTestFrameworkTest extends TestBase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		startApp(HelloWorldVerticleTestClient.class.getName());
+		startApp(HelloWorldVerticleOfficialTestFrameworkTestClient.class.getName());
 	}
 
 	@Override

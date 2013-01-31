@@ -1,115 +1,92 @@
 /*
-* Copyright 2012 the original author or authors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2012 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-apply plugin: 'java'
+/*
+ * These modules should be set to whatever you need. For Java projects using
+ * the Eclipse IDE for example:
+ * apply plugin: 'java'
+ * apply plugin: 'eclipse'
+ */
+apply plugin: 'scala'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-defaultTasks = ['assemble']
+/*
+ * This line loads the Vert.x plugin provided in gradle/vertx.gradle.
+ */
+apply from: 'gradle/vertx.gradle'
 
-sourceCompatibility = '1.7'
-targetCompatibility = '1.7'
+/*
+ * Here come the Vert.x specific settings.
+ */
+vertx {
 
-configurations {
-  provided
-}
+	/*
+	 * Set the desired version number of Vert.x. Default = '1.3.1.final'
+	 */
+	version = '1.3.1.final'
 
-repositories {
-  maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-  mavenCentral()
-}
+	/* 
+	 * Loads language jars from maven.
+	 * This array may include: 'groovy', 'java', 'jruby', 'jython', 'rhino'
+	 * If you use Scala, you should include 'java' here.
+	 */
+	langs = ['java']
 
-dependencies {
-  provided "org.vert-x:vertx-core:$vertxVersion"
-  provided "org.vert-x:vertx-platform:$vertxVersion"
+	/* 
+	 * Whether to include the test framework jar. Default = off
+	 */
+	useTestframework = true
 
-  testCompile "org.vert-x:vertx-lang-java:$vertxVersion"
-  testCompile( "org.vert-x:vertx-testframework:$vertxVersion" ) {
-    transitive = false
-  }
-  testCompile "junit:junit:$junitVersion"
-}
+	/*
+	 * If you want to use the vertx-junit-annotations, as used in the example,
+	 * you need to put the version number here.
+	 * Default = null
+	 */
+	annotationsVersion = '1.3.0.final'
 
-sourceSets {
-  main {
-    compileClasspath = compileClasspath + configurations.provided
-  }
-}
+	/*
+	 * If set to a version number ('4.10' for example), junit will be loaded
+	 * from maven.
+	 * Default = null
+	 */
+	junitVersion = '4.10'
 
-task copyMod( type:Copy, dependsOn: 'classes' ) {
-  into "build/copyMod/$modulename-v$version"
-  from 'build/classes/main'
-  from 'src/main/conf'
-  into( 'lib' ) {
-    from configurations.compile
-  }
-}
+	/*
+	 * If set, uses scala - loads dependencies, provides scala tools, etc.
+	 * You still need to include the scala-library in your mod.json like this:
+	 * {
+	 *   "includes" : "org.scala-lang.scala-library-v2.9.2"
+	 * }
+	 * Currently, there is only a 2.9.2 version in the repository, it may
+	 * change with Vert.x 2.0 or when Scala is available as language module in
+	 * Vert.x.
+	 * Default = null
+	 */
+	scalaVersion = "2.9.2"
 
-task prepareVertxTest(type: Sync, dependsOn: ['copyMod']) {
-  from 'build/copyMod'
-  into 'build/tmp/mod-test'
-}
+	/*
+	 * The desired timeout of tests.
+	 * Default = 15
+	 */
+	testTimeout = 30
 
-test {
-  // Can't have the app on the vert.x classpath
-  classpath = files( classpath.findAll {
-    !( it.toString() ==~ /.+build\/(classes|resources)\/main$/ )
-	// fixing some weird eclipse highlighting bug in gradle: /$
-  } )
-
-  // Some vert.x properties
-  systemProperty 'vertx.test.timeout', "$project.testTimeout"
-  systemProperty 'vertx.mods', "$projectDir/build/tmp/mod-test"
-  systemProperty 'vertx.version', "$project.version"
-  systemProperty 'module.name', "$modulename-v$version"
-
-  // Dump output
-  testLogging.showStandardStreams = true
-
-  // No idea why we need to depend on testClasses...
-  dependsOn << [ 'testClasses', 'copyMod', 'prepareVertxTest' ]
-}
-
-task collectDeps(type: Copy) {
-  group = 'vert.x'
-  description = 'conveniently collect dependencies for other IDEs'
-  destinationDir = file("build/deps")
-  into("compile") {
-    from configurations.compile
-  }
-  into("test") {
-    from configurations.testCompile
-  }
-}
-
-// Package into build/libs/mod.zip
-task packMod( type: Zip, dependsOn: 'copyMod' ) {
-  group = 'vert.x'
-  description = "Assembles a vert.x module in 'mod.zip' format"
-  destinationDir = project.file('build/libs')
-  archiveName = 'mod.zip'
-  from project.file("build/copyMod")
-}
-
-task release( type: Copy, dependsOn: ['packMod'] ) {
-  group = 'vert.x'
-  description = "Builds the module for use in the module repository into mods/$modulename-v$version"
-  destinationDir = project.file('build/release')
-  into ("$modulename-v$version") {
-    from 'build/libs/mod.zip'
-    from 'README.md'
-  }
+	/*
+	 * Shows the standard streams during tests.
+	 * Default = true
+	 */
+	showStandardStreams = true
 }
