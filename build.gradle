@@ -76,7 +76,7 @@ vertx {
 	 * Vert.x.
 	 * Default = null
 	 */
-	scalaVersion = "2.9.2"
+	scalaVersion = "2.10.0"
 
 	/*
 	 * The desired timeout of tests.
