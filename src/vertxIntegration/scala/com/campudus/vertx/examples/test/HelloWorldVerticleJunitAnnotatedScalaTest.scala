@@ -22,7 +22,7 @@ class HelloWorldVerticleJunitAnnotatedScalaTest extends VertxTestBase {
 
   private val timeout = 10L;
 
-  private def checkAsync(address: String, question: JsonObject, handler: (JsonObject) => Unit) {
+  private def checkAsync(address: String, question: JsonObject)(handler: (JsonObject) => Unit) {
     val queue = new LinkedBlockingQueue[JsonObject]();
 
     getVertx().eventBus().send(address, question,
@@ -45,37 +45,37 @@ class HelloWorldVerticleJunitAnnotatedScalaTest extends VertxTestBase {
 
   @Test
   def testHello() {
-    checkAsync("hello", new JsonObject().putString("say", "hello"), {
+    checkAsync("hello", new JsonObject().putString("say", "hello")) {
       event =>
-        assertEquals("hi there!", event.getString("result"));
-        assertNull(event.getString("error"));
-    });
+        assertEquals("hi there!", event.getString("result"))
+        assertNull(event.getString("error"))
+    }
   }
 
   @Test
   def testBye() {
-    checkAsync("hello", new JsonObject().putString("say", "bye"), {
+    checkAsync("hello", new JsonObject().putString("say", "bye")) {
       event =>
-        assertEquals("have a nice day!", event.getString("result"));
-        assertNull(event.getString("error"));
-    });
+        assertEquals("have a nice day!", event.getString("result"))
+        assertNull(event.getString("error"))
+    }
   }
 
   @Test
   def testMissing() {
-    checkAsync("hello", new JsonObject().putString("foobar", "hello"), {
+    checkAsync("hello", new JsonObject().putString("foobar", "hello")) {
       event =>
-        assertNull(event.getString("result"));
-        assertEquals("action missing", event.getString("error"));
-    });
+        assertNull(event.getString("result"))
+        assertEquals("action missing", event.getString("error"))
+    }
   }
 
   @Test
   def testUnknown() {
-    checkAsync("hello", new JsonObject().putString("say", "foobar"), {
+    checkAsync("hello", new JsonObject().putString("say", "foobar")) {
       event =>
-        assertNull(event.getString("result"));
-        assertEquals("don't know what to say", event.getString("error"));
-    });
+        assertNull(event.getString("result"))
+        assertEquals("don't know what to say", event.getString("error"))
+    }
   }
 }
