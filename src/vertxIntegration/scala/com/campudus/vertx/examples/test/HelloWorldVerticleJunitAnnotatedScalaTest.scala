@@ -28,19 +28,13 @@ class HelloWorldVerticleJunitAnnotatedScalaTest extends VertxTestBase {
     getVertx().eventBus().send(address, question,
       new QueueReplyHandler[JsonObject](queue, timeout));
 
-    try {
-      val answer = queue.poll(timeout, TimeUnit.SECONDS);
+    val answer = queue.poll(timeout, TimeUnit.SECONDS);
 
-      if (answer == null) {
-        fail("Did not receive answer in time for: " + question.encode());
-      }
-
-      handler(answer);
-
-    } catch {
-      case e: InterruptedException =>
-      //
+    if (answer == null) {
+      fail("Did not receive answer in time for: " + question.encode());
     }
+
+    handler(answer);
   }
 
   @Test
